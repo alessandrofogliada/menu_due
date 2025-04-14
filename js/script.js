@@ -4,46 +4,55 @@ document.addEventListener("DOMContentLoaded", () => {
   const navButtons = document.querySelectorAll(".nav-btn");
   const loader = document.getElementById("loader");
 
-  const menuURL = "https://script.google.com/macros/s/AKfycbymjjR9WKi-1MtduV_RVH0Yx6xWA0jRfBIjRNcY--diwwn9mU2UOP6x1KDilN6YpWfG/exec";
+  const menuURL = "https://script.google.com/macros/s/AKfycbw9vtMnB4nj-TgsCmKHGkk6tzJiefLrgIeawXfVOfAiGkk6n9krfmkudXAV5OpZxbcr/exec";
 
   let menuData = {};
 
   loader.style.display = "flex";
+
   fetch(menuURL)
   .then(res => res.json())
   .then(data => {
-    data.forEach(item => {
-      const categoria = item.Categoria?.toLowerCase() || "generale";
-      const sottosezione = item.Sottosezione || "Senza sezione";
-      console.log("Dati ricevuti:", data); // 👈 AGGIUNGI QUESTO
+    for (const categoria in data) {
+      const items = data[categoria];
+      const catKey = categoria.toLowerCase();
 
-
-      if (!menuData[categoria]) {
-        menuData[categoria] = { sottosezioni: [], piatti: {} };
+      if (!menuData[catKey]) {
+        menuData[catKey] = { sottosezioni: [], piatti: {} };
       }
 
-      if (!menuData[categoria].sottosezioni.includes(sottosezione)) {
-        menuData[categoria].sottosezioni.push(sottosezione);
-        menuData[categoria].piatti[sottosezione] = [];
-      }
+      items.forEach(item => {
+        const sottosezione = item.Sottosezione?.trim() || "Senza sezione";
 
-      menuData[categoria].piatti[sottosezione].push({
-        nome: item.Nome,
-        descrizione: item.Descrizione,
-        prezzo: item.Prezzo,
-        allergeni: item.Allergeni
+        if (!menuData[catKey].sottosezioni.includes(sottosezione)) {
+          menuData[catKey].sottosezioni.push(sottosezione);
+          menuData[catKey].piatti[sottosezione] = [];
+        }
+
+        menuData[catKey].piatti[sottosezione].push({
+          nome: item.Nome,
+          descrizione: item.Descrizione,
+          prezzo: item.Prezzo,
+          allergeni: item.Allergeni,
+          "Prezzo Piccola": item["Prezzo Piccola"],
+          "Prezzo Media": item["Prezzo Media"],
+          "Prezzo Caraffa": item["Prezzo Caraffa"],
+          "Prezzo Calice": item["Prezzo Calice"],
+          "Prezzo Bott. 0,375": item["Prezzo Bott. 0,375"],
+          "Prezzo Bott. 0,75": item["Prezzo Bott. 0,75"]
+        });
       });
-    });
+    }
 
     renderSubNav("pizze");
     loader.style.display = "none";
-
   })
-    
   .catch(err => {
     console.error("Errore nel caricamento del menu:", err);
-    loader.style.display = "none"; // ✅ dentro il catch
+    loader.style.display = "none";
   });
+
+
   
     function renderSubNav(cat) {
       subNav.innerHTML = "";
@@ -168,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderMenuFlat(cat); // Mostra tutto all'inizio
   }  
   
-
   function renderMenuFlat(cat) {
     const data = menuData[cat];
     if (!data) return;
@@ -180,14 +188,40 @@ document.addEventListener("DOMContentLoaded", () => {
       if (items?.length) {
         html += `
           <div class="menu-section">
-            <h2>${sub}</h2>
-            ${items.map(item => `
-              <div class="menu-item">
-                <div class="title">${item.nome} <span class="price">${item.prezzo}</span></div>
-                <div class="desc">${item.descrizione}</div>
-                <div class="allergeni">Allergeni: ${item.allergeni}</div>
-              </div>
-            `).join("")}
+            ${sub !== "Senza sezione" ? `<h2>${sub}</h2>` : ""}
+            ${items.map(item => {
+              const isBirra = cat === "birre";
+              const isVino = cat === "vini";
+  
+              let prezzoExtra = "";
+  
+              if (isBirra) {
+                prezzoExtra = `
+                  <div class="prezzi-formati">
+                    ${item["Prezzo Piccola"] ? `<div>Piccola: €${item["Prezzo Piccola"]}</div>` : ""}
+                    ${item["Prezzo Media"] ? `<div>Media: €${item["Prezzo Media"]}</div>` : ""}
+                    ${item["Prezzo Caraffa"] ? `<div>Caraffa: €${item["Prezzo Caraffa"]}</div>` : ""}
+                  </div>
+                `;
+              } else if (isVino) {
+                prezzoExtra = `
+                  <div class="prezzi-formati">
+                    ${item["Prezzo Calice"] ? `<div>Calice: €${item["Prezzo Calice"]}</div>` : ""}
+                    ${item["Prezzo Bott. 0,375"] ? `<div>0,375L: €${item["Prezzo Bott. 0,375"]}</div>` : ""}
+                    ${item["Prezzo Bott. 0,75"] ? `<div>0,75L: €${item["Prezzo Bott. 0,75"]}</div>` : ""}
+                  </div>
+                `;
+              }
+  
+              return `
+                <div class="menu-item">
+                  <div class="title">${item.nome}</div>
+                  <div class="desc">${item.descrizione || ""}</div>
+                  ${prezzoExtra || `<div class="price">€${item.prezzo}</div>`}
+                  <div class="allergeni">Allergeni: ${item.allergeni || "-"}</div>
+                </div>
+              `;
+            }).join("")}
           </div>
         `;
       }
@@ -195,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
     menuContent.innerHTML = html || "<p class='text-center'>Nessun elemento disponibile.</p>";
   }
-  
+    
 
   navButtons.forEach(btn => {
     btn.addEventListener("click", () => {
