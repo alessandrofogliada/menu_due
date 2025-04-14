@@ -66,30 +66,64 @@ document.addEventListener("DOMContentLoaded", () => {
         const btn = document.createElement("button");
         btn.textContent = sub;
         btn.dataset.sub = sub;
-        btn.onclick = () => renderMenu(cat, sub);
-        subNav.appendChild(btn);
+        btn.onclick = () => {
+          // Rimuove 'active' da tutti
+          subNav.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+          // Aggiunge 'active' solo al cliccato
+          btn.classList.add("active");
+        
+          renderMenu(cat, sub);
+        };
+                subNav.appendChild(btn);
       });
     
       renderMenu(cat, data.sottosezioni[0]);
     }
     
 
-  function renderMenu(cat, sub) {
-    const items = menuData[cat]?.piatti[sub] || [];
-
-    menuContent.innerHTML = `
-      <div class="menu-section">
-        <h2>${sub}</h2>
-        ${items.map(item => `
-          <div class="menu-item">
-            <div class="title">${item.nome} <span class="price">${item.prezzo}</span></div>
-            <div class="desc">${item.descrizione}</div>
-            <div class="allergeni">Allergeni: ${item.allergeni}</div>
-          </div>
-        `).join("")}
-      </div>
-    `;
-  }
+    function renderMenu(cat, sub) {
+      const items = menuData[cat]?.piatti[sub] || [];
+    
+      menuContent.innerHTML = `
+        <div class="menu-section">
+          <h2>${sub}</h2>
+          ${items.map(item => {
+            const isBirra = cat === "birre";
+            const isVino = cat === "vini";
+    
+            let prezzoExtra = "";
+    
+            if (isBirra) {
+              prezzoExtra = `
+                <div class="prezzi-formati">
+                  ${item["Prezzo Piccola"] ? `<div>Piccola: €${item["Prezzo Piccola"]}</div>` : ""}
+                  ${item["Prezzo Media"] ? `<div>Media: €${item["Prezzo Media"]}</div>` : ""}
+                  ${item["Prezzo Caraffa"] ? `<div>Caraffa: €${item["Prezzo Caraffa"]}</div>` : ""}
+                </div>
+              `;
+            } else if (isVino) {
+              prezzoExtra = `
+                <div class="prezzi-formati">
+                  ${item["Prezzo Calice"] ? `<div>Calice: €${item["Prezzo Calice"]}</div>` : ""}
+                  ${item["Prezzo Bott. 0,375"] ? `<div>0,375L: €${item["Prezzo Bott. 0,375"]}</div>` : ""}
+                  ${item["Prezzo Bott. 0,75"] ? `<div>0,75L: €${item["Prezzo Bott. 0,75"]}</div>` : ""}
+                </div>
+              `;
+            }
+    
+            return `
+              <div class="menu-item">
+                <div class="title">${item.nome}</div>
+                <div class="desc">${item.descrizione || ""}</div>
+                ${prezzoExtra || `<div class="price">€${item.prezzo}</div>`}
+                <div class="allergeni">Allergeni: ${item.allergeni || "-"}</div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+    
 
   function renderSubNav(cat) {
     subNav.innerHTML = "";
