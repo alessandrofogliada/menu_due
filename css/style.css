@@ -1,0 +1,101 @@
+body {
+    margin: 0;
+    font-family: 'Helvetica Neue', sans-serif;
+    background: #f9f9f9;
+    color: #333;
+  }
+  
+  .header {
+    background: #fff;
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    position: relative;
+  }
+  
+  .lang-switch {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #eee;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .main-nav,
+  .sub-nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: #510000; /* tuo rosso scuro */
+  }
+  
+  .main-nav button,
+  .sub-nav button {
+    background: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    white-space: nowrap;
+    color: #510000;
+    cursor: pointer;
+  }
+  
+  .nav-btn.active {
+    background: #b10000; /* rosso acceso */
+    color: white;
+  }
+  
+  .menu-content {
+    padding: 1rem;
+  }
+  
+  .menu-section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  .menu-section h2 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #510000;
+  }
+  
+  .menu-item {
+    border-top: 1px solid #eee;
+    padding: 0.5rem 0;
+  }
+  
+  .menu-item:first-child {
+    border-top: none;
+  }
+  
+  .menu-item .title {
+    font-weight: bold;
+    font-size: 1rem;
+  }
+  
+  .menu-item .desc {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  
+  .menu-item .price {
+    float: right;
+    font-weight: bold;
+    color: #b10000;
+  }
+  
+  .menu-item .allergeni {
+    font-size: 0.75rem;
+    color: #888;
+    font-style: italic;
+    margin-top: 0.3rem;
+  }
+  
